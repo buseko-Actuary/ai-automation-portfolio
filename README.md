@@ -1,3 +1,4 @@
+```
 # AI & Automation Portfolio — Buseko, Insight Analytics
 
 Case studies from client automation systems I've designed and built as the AI & Automation Specialist at **Insight Analytics** (Lusaka, Zambia). Each write-up covers the problem, the architecture, and the stack used.
@@ -6,13 +7,11 @@ Case studies from client automation systems I've designed and built as the AI & 
 
 ## Case studies
 
-1. [AI Concierge — Trekking Travels & Tours](projects/01-trekking-travels-ai-concierge.md) — multi-channel AI customer service & CRM agent
-2. [AI CV Screening — Zega](projects/02-ai-cv-screening-zega.md) — automated resume ranking with scheduled PDF reports
-3. [Excel → Executive Dashboard → PDF](projects/03-excel-to-dashboard-reporting.md) — self-service reporting pipeline
-4. [WhatsApp Business Automation Suite](projects/04-whatsapp-business-automation-suite.md) — reminders, collections, invoicing, support bots
-5. [HR Training Compliance Matrix — Zega](projects/05-zega-hr-training-matrix.md) — certification tracking & compliance dashboard
-6. [Fleet & Driver Management — Platinum Courier](projects/06-platinum-courier-fleet-system.md) — logistics operations system
-7. [College Management Suite](projects/07-insight-analytics-college-suite.md) — student/fee/ledger administration system
+1. [AI CV Screening — Zega](projects/01-ai-cv-screening-zega.md) — automated resume ranking with scheduled PDF reports
+2. [Excel → Executive Dashboard → PDF](projects/02-excel-to-dashboard-reporting.md) — self-service reporting pipeline
+3. [WhatsApp Business Automation Suite](projects/03-whatsapp-business-automation-suite.md) — reminders, collections, invoicing, support bots
+4. [HR Training Compliance Matrix — Zega](projects/04-zega-hr-training-matrix.md) — certification tracking & compliance dashboard
+5. [Fleet & Driver Management — Platinum Courier](projects/05-platinum-courier-fleet-system.md) — logistics operations system
 
 ## Stack across these projects
 
@@ -20,3 +19,6 @@ Case studies from client automation systems I've designed and built as the AI & 
 
 ---
 Founder & AI/Automation Specialist — [Insight Analytics](https://github.com/buseko-Actuary)
+```
+
+---
