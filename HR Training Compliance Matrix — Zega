@@ -1,0 +1,79 @@
+```
+# HR Training Compliance Matrix — Zega
+
+**Client:** Zega
+**What it is:** A scaled Excel system that tracks mandatory staff training/certifications against role requirements, flags expiring or overdue certifications before they lapse, and gives management a live compliance dashboard — built for a workforce where specific certifications are a hard operational/regulatory requirement (e.g. safety, security, and handling qualifications tied to specific job functions).
+
+## The problem
+
+Staff training records were tracked in a flat spreadsheet with no structure — no way to quickly see who was overdue for renewal, no per-role training requirement mapping, and no dashboard view for management to catch compliance gaps before they became a problem.
+
+## What I built
+
+```mermaid
+flowchart TD
+    A[(General Matrix\nstaff x required modules)] --> B[Dashboard\ncompliance overview]
+    A --> C[Module Search\nfind who holds a given certification]
+    A --> D[Expiry Alerts\nupcoming / overdue renewals]
+    E[(Reference data)] --> A
+```
+
+**Key design choices:**
+- **One matrix, multiple views** — a single source-of-truth grid cross-referencing staff against every required training module, with a dashboard, a searchable module lookup, and an expiry-alert view all built as live formulas over that one grid rather than duplicated data.
+- **Scaled for a larger workforce** — rebuilt from an earlier version to handle significantly more staff and training modules without breaking down (this is the "scaled" version referenced in the case study title).
+- **Expiry-driven, not just record-keeping** — the point isn't just storing certification dates, it's surfacing what's about to lapse *before* it becomes a compliance gap.
+
+## Stack
+
+Excel (formula-driven matrix, dashboard, conditional views)
+
+## Status
+
+Delivered; in monthly-update use.
+```
+
+---
+
+## FILE 5 — Fleet & Driver Management — Platinum Courier (new file)
+
+**Go to:** https://github.com/buseko-Actuary/ai-automation-portfolio/new/main
+**Filename field:** `projects/05-platinum-courier-fleet-system.md`
+
+**Paste this:**
+
+```
+# Fleet & Driver Management — Platinum Courier
+
+**Client:** Platinum Courier Services
+**What it is:** An Excel-based logistics operations system covering trip logging, driver management, vehicle inventory, and automated distance-based costing for a courier fleet.
+
+## The problem
+
+Trip logs, driver assignments, and vehicle records were kept separately with no automatic distance/cost calculation — every trip's distance and pricing had to be worked out manually against a reference table.
+
+## What I built
+
+```mermaid
+flowchart TD
+    A[Dashboard\nfleet KPIs] --> B[(Log Sheet\ntrip records)]
+    B --> C[Distance Reference\nlookup table]
+    C --> D[Auto-computed distance & cost per trip]
+    B --> E[(Driver Details)]
+    B --> F[(Vehicle Inventory)]
+```
+
+**Key design choices:**
+- **Distance/cost auto-calculation** — trip records pull from a distance reference table instead of manual lookup, cutting a repetitive step out of every single trip entry.
+- **Single system, four views** — dashboard, trip log, driver records, and vehicle inventory all live in one workbook with consistent cross-references instead of separate untracked files.
+- **Built for daily operational use**, not a one-off report — designed around how dispatch actually logs a trip in real time.
+
+## Stack
+
+Excel (formula-driven lookups, dashboard, structured data tables)
+
+## Status
+
+Delivered, in production use (multiple iterations shipped as operational needs evolved).
+```
+
+---
