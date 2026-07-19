@@ -1,24 +1,26 @@
-```
-# AI & Automation Portfolio — Buseko, Insight Analytics
+# 🤖 AI & Automation Portfolio
 
-Case studies from client automation systems I've designed and built as the AI & Automation Specialist at **Insight Analytics** (Lusaka, Zambia). Each write-up covers the problem, the architecture, and the stack used.
+**Case studies from client automation systems built as the AI & Automation Specialist at Insight Analytics.**
 
-> **A note on IP:** these are real, deployed/in-progress client systems. To respect client confidentiality and avoid the workflows simply being copy-pasted, I publish architecture diagrams and design write-ups here — not the exported n8n workflow JSON, credentials, spreadsheet data, or client-identifying details beyond the client name.
+![n8n](https://img.shields.io/badge/n8n-Workflow%20Automation-EA4B71) ![Claude](https://img.shields.io/badge/Claude-Anthropic%20API-D97757) ![Excel](https://img.shields.io/badge/Excel-VBA-217346) ![Location](https://img.shields.io/badge/Based%20in-Lusaka%2C%20Zambia-informational)
 
-## Case studies
+*Real, deployed/in-progress client systems — architecture and design write-ups only, not exported workflow files or client data.*
 
-1. [AI CV Screening — Zega](projects/01-ai-cv-screening-zega.md) — automated resume ranking with scheduled PDF reports
-2. [Excel → Executive Dashboard → PDF](projects/02-excel-to-dashboard-reporting.md) — self-service reporting pipeline
-3. [WhatsApp Business Automation Suite](projects/03-whatsapp-business-automation-suite.md) — reminders, collections, invoicing, support bots
-4. [HR Training Compliance Matrix — Zega](projects/04-zega-hr-training-matrix.md) — certification tracking & compliance dashboard
-5. [Fleet & Driver Management — Platinum Courier](projects/05-platinum-courier-fleet-system.md) — logistics operations system
+---
 
-## Stack across these projects
+## ✨ Case studies
 
-`n8n` · `Claude (Anthropic API)` · `Google Workspace API (Sheets/Drive/Docs)` · `WhatsApp Business Cloud API` · `Meta Graph API` · `Excel/VBA` · `PDF generation`
+| Project | What it does | Client |
+|---|---|---|
+| 📄 [AI CV Screening](projects/01-ai-cv-screening-zega.md) | Automated resume ranking with scheduled PDF reports | Zega |
+| 📊 [Excel → Executive Dashboard → PDF](projects/02-excel-to-dashboard-reporting.md) | Self-service reporting pipeline | Insight Analytics |
+| 💬 [WhatsApp Business Automation Suite](projects/03-whatsapp-business-automation-suite.md) | Reminders, collections, invoicing, support bots | Insight Analytics & clients |
+| 🎓 [HR Training Compliance Matrix](projects/04-zega-hr-training-matrix.md) | Certification tracking & compliance dashboard | Zega |
+| 🚚 [Fleet & Driver Management](projects/05-platinum-courier-fleet-system.md) | Logistics operations system | Platinum Courier |
+
+## 🛠️ Stack across these projects
+
+`n8n` · `Claude (Anthropic API)` · `Google Workspace API` · `WhatsApp Business Cloud API` · `Meta Graph API` · `Excel/VBA` · `PDF generation`
 
 ---
 Founder & AI/Automation Specialist — [Insight Analytics](https://github.com/buseko-Actuary)
-```
-
----
