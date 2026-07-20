@@ -1,0 +1,165 @@
+{
+  "name": "Tax Status — My First Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Tax Status",
+        "formFields": {
+          "values": [
+            { "fieldLabel": "First Name" },
+            { "fieldLabel": "Last Name" },
+            { "fieldLabel": "Email", "fieldType": "email" },
+            {
+              "fieldLabel": "Salary Range",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  { "option": "50k - 500k" },
+                  { "option": "600k+" },
+                  { "option": "800k+" }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [0, 0],
+      "id": "778b1a90-01bc-438d-b883-461fa70a64cc",
+      "name": "On form submission",
+      "webhookId": ""
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "First Name": "={{ $json['First Name'] }}",
+            "Last Name": "={{ $json['Last Name'] }}",
+            "Email": "={{ $json.Email }}",
+            "Salary Range": "={{ $json['Salary Range'] }}",
+            "Tax Status": "={{ $json['Salary Range'] === '600k+' ? 'to pay tax' : 'no tax' }}"
+          },
+          "matchingColumns": ["Email"],
+          "schema": [
+            { "id": "First Name", "displayName": "First Name", "type": "string", "canBeUsedToMatch": true, "display": true, "removed": false },
+            { "id": "Last Name", "displayName": "Last Name", "type": "string", "canBeUsedToMatch": true, "display": true, "removed": false },
+            { "id": "Email", "displayName": "Email", "type": "string", "canBeUsedToMatch": true, "display": true, "removed": false },
+            { "id": "Salary Range", "displayName": "Salary Range", "type": "string", "canBeUsedToMatch": true, "display": true, "removed": false },
+            { "id": "Tax Status", "displayName": "Tax Status", "type": "string", "canBeUsedToMatch": true, "display": true, "removed": false }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [208, 0],
+      "id": "a1977776-5eca-468d-af19-ce2cf4a56050",
+      "name": "Append or update row in sheet"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict", "version": 3 },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('On form submission').item.json['Salary Range'] }}",
+                    "rightValue": "600k+",
+                    "operator": { "type": "string", "operation": "equals" },
+                    "id": "b2e4fad5-037e-4ab6-9751-e6af93f91087"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict", "version": 3 },
+                "conditions": [
+                  {
+                    "id": "03cf1a37-d4f1-4bbd-9187-9a2332b52f5d",
+                    "leftValue": "={{ $('On form submission').item.json['Salary Range'] }}",
+                    "rightValue": "800k+",
+                    "operator": { "type": "string", "operation": "equals", "name": "filter.operator.equals" }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [416, 0],
+      "id": "ad060b67-b76c-43a1-ba87-5ab0d1c56cf3",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Append or update row in sheet').item.json.Email }}",
+        "subject": "Tax Status",
+        "emailType": "text",
+        "message": "=Dear {{ $('Append or update row in sheet').item.json['First Name'] }}\nyou are paying tax",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [624, -96],
+      "id": "98bfcb86-7f4b-4188-a408-3c1aea446f4f",
+      "name": "Send a message",
+      "webhookId": ""
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Append or update row in sheet').item.json.Email }}",
+        "subject": "Tax Status",
+        "emailType": "text",
+        "message": "=Dear {{ $('Append or update row in sheet').item.json['First Name'] }}\nyou are not paying tax\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [608, 160],
+      "id": "15e38c3f-bde9-486f-8d62-601a8938cc04",
+      "name": "Send a message1",
+      "webhookId": ""
+    }
+  ],
+  "connections": {
+    "On form submission": {
+      "main": [[{ "node": "Append or update row in sheet", "type": "main", "index": 0 }]]
+    },
+    "Append or update row in sheet": {
+      "main": [[{ "node": "Switch", "type": "main", "index": 0 }]]
+    },
+    "Switch": {
+      "main": [
+        [{ "node": "Send a message", "type": "main", "index": 0 }],
+        [{ "node": "Send a message1", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {}
+}

@@ -23,4 +23,14 @@
 `n8n` · `Claude (Anthropic API)` · `Google Workspace API` · `WhatsApp Business Cloud API` · `Meta Graph API` · `Excel/VBA` · `PDF generation`
 
 ---
+
+## 🌱 Where it started
+
+Before any of the above, there was one small workflow that started everything — and unlike the client work, **it's fully open and free to import:**
+
+| Project | What it does | |
+|---|---|---|
+| 🌱 [My First Workflow — Tax Status Notifier](projects/00-first-workflow-tax-status.md) | Form → Google Sheet → conditional logic → automated email | ⬇️ [Downloadable](workflows/tax-status-first-workflow.json) |
+
+---
 Founder & AI/Automation Specialist — [Insight Analytics](https://github.com/buseko-Actuary)
