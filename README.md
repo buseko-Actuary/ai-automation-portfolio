@@ -32,5 +32,13 @@ Before any of the above, there was one small workflow that started everything �
 |---|---|---|
 | 🌱 [My First Workflow — Tax Status Notifier](projects/00-first-workflow-tax-status.md) | Form → Google Sheet → conditional logic → automated email | ⬇️ [Downloadable](workflows/tax-status-first-workflow.json) |
 
+## 🔎 Open experiments
+
+Personal builds exploring new tools, also **free to import:**
+
+| Project | What it does | |
+|---|---|---|
+| 🔎 [AI Research & Content Engine](projects/04-ai-research-content-engine.md) | Tavily live web search + OpenAI synthesis, queued and delivered through a Google Sheet | ⬇️ [Downloadable](workflows/ai-research-content-engine.json) |
+
 ---
 Co-Founder & AI/Automation Specialist — [Insight Analytics](https://github.com/buseko-Actuary)
