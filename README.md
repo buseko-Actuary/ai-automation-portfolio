@@ -20,7 +20,7 @@
 
 ## 🛠️ Stack across these projects
 
-`n8n` · `Claude (Anthropic API)` · `Google Workspace API` · `WhatsApp Business Cloud API` · `Meta Graph API` · `PDF generation`
+`n8n` · `Claude (Anthropic API)` · `OpenAI` · `Pinecone (vector database)` · `Google Workspace API` · `WhatsApp Business Cloud API` · `Meta Graph API` · `PDF generation`
 
 ---
 
@@ -38,6 +38,7 @@ Personal builds exploring new tools, also **free to import:**
 
 | Project | What it does | |
 |---|---|---|
+| 🧠 [WhatsApp RAG Agent](projects/05-whatsapp-rag-agent.md) | Drop a document in Google Drive, ask about it on WhatsApp. Pinecone vector store + OpenAI embeddings, retrieval wired to the agent as a tool | ⬇️ [Downloadable](workflows/whatsapp-rag-agent.json) |
 | 🔎 [AI Research & Content Engine](projects/04-ai-research-content-engine.md) | Tavily live web search + OpenAI synthesis, queued and delivered through a Google Sheet | ⬇️ [Downloadable](workflows/ai-research-content-engine.json) |
 
 ---
