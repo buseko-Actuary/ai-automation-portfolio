@@ -125,6 +125,7 @@ It also matters for client work. Recorded training sessions, webinars and stakeh
 - **Copy an API's error paths, not just its success path.** Wiring 402 separately from a generic error took ten extra minutes and turns "it broke" into "top up the account."
 - **Never trust one response shape.** This API has returned `text`, `transcript`, an array of segments, and a nested `tracks[]` structure. Parsing defensively for all four costs nothing and saves a debugging session.
 - **Green does not mean working.** My first two runs finished in 83ms and 44ms and reported success. Both did nothing, because my headers had gone into one cell instead of six and the guard node quietly sent every row down the false branch. **A suspiciously fast success is a failure that has not identified itself.** Run time is now the first thing I check.
+- **Read what a node is actually called, not what you assume it does.** n8n's Convert to File node is subtitled *"Move Base64 String to File"*, and it means it. Handed plain text, it decoded 2,380 words as base64 and wrote out 9 bytes of noise. The workflow reported success, the sheet said Done, and the file was garbage. The markdown has to be base64 encoded before it reaches that node.
 - **Put the config in one node.** Token and folder ID sit in a single Settings node. Anyone importing this edits one place instead of hunting through eleven nodes.
 - **The boring interface wins.** A Google Sheet is not impressive. It is also the reason I use this every day, because pasting a link into a spreadsheet is something I would do anyway.
 
