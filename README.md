@@ -38,6 +38,7 @@ Personal builds exploring new tools, also **free to import:**
 
 | Project | What it does | |
 |---|---|---|
+| 📼 [YouTube to Markdown](projects/06-youtube-transcript-to-markdown.md) | Paste a YouTube link into a Google Sheet, get a clean markdown transcript in Drive, ready to hand to an AI assistant. Every failure reason written back to the row | ⬇️ [Downloadable](workflows/youtube-transcript-to-markdown.json) |
 | 🧠 [WhatsApp RAG Agent](projects/05-whatsapp-rag-agent.md) | Drop a document in Google Drive, ask about it on WhatsApp. Pinecone vector store + OpenAI embeddings, retrieval wired to the agent as a tool | ⬇️ [Downloadable](workflows/whatsapp-rag-agent.json) |
 | 🔎 [AI Research & Content Engine](projects/04-ai-research-content-engine.md) | Tavily live web search + OpenAI synthesis, queued and delivered through a Google Sheet | ⬇️ [Downloadable](workflows/ai-research-content-engine.json) |
 

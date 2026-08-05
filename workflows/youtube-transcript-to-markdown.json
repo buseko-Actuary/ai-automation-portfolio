@@ -1,0 +1,528 @@
+﻿{
+  "name": "YouTube Link to Markdown Transcript",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## HOW TO USE\n\n**1.** Create a Google Sheet with these headers in row 1:\n\nVideo URL | Status | Title | Markdown File | Processed At | Notes\n\nType them into six separate cells. Pasting them as one tab-separated string puts them all in A1 and the workflow will silently do nothing.\n\n**2.** Create a Google Drive folder for the .md files.\n\n**3.** Open the **Settings** node and paste your youtube-transcript.io API token and the Drive folder ID.\n\n**4.** Put your Sheet URL on the trigger, **Mark Row Done** and **Mark Row Failed**.\n\n**5.** Pick your Google credential on all four Google nodes, then activate.\n\nPaste a YouTube link into the **Video URL** column.\nWithin a minute you get a .md file in Drive and the row is marked Done.",
+        "height": 460,
+        "width": 460,
+        "color": 4
+      },
+      "id": "note-howto",
+      "name": "Sticky Note - How To Use",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-1600, 60],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "REPLACE_WITH_YOUR_GOOGLE_SHEET_URL"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Sheet1"
+        },
+        "event": "rowAdded",
+        "options": {}
+      },
+      "id": "trg-sheet",
+      "name": "New YouTube Link in Sheet",
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "position": [-1088, 400],
+      "typeVersion": 1,
+      "notes": "Checks the sheet every minute for a newly added row."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "is-yt-url",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              },
+              "leftValue": "={{ $json['Video URL'] }}",
+              "rightValue": "(youtube\\.com|youtu\\.be)"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "id": "if-is-yt",
+      "name": "Is It A YouTube Link?",
+      "type": "n8n-nodes-base.if",
+      "position": [-880, 400],
+      "typeVersion": 2,
+      "notes": "Ignores blank rows and anything that is not a YouTube link."
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "set-token",
+              "name": "apiToken",
+              "type": "string",
+              "value": "REPLACE_WITH_YOUR_TRANSCRIPT_API_TOKEN"
+            },
+            {
+              "id": "set-folder",
+              "name": "driveFolderId",
+              "type": "string",
+              "value": "REPLACE_WITH_YOUR_DRIVE_FOLDER_ID"
+            },
+            {
+              "id": "set-url",
+              "name": "videoUrl",
+              "type": "string",
+              "value": "={{ $json['Video URL'] }}"
+            },
+            {
+              "id": "set-rownum",
+              "name": "rowNumber",
+              "type": "number",
+              "value": "={{ $json.row_number }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-settings",
+      "name": "Settings",
+      "type": "n8n-nodes-base.set",
+      "position": [-672, 400],
+      "typeVersion": 3.4,
+      "notes": "The only node you edit. Token + Drive folder ID."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pull the 11 character video ID out of any YouTube link format.\nconst url = String($json.videoUrl || '').trim();\n\nconst patterns = [\n  /[?&]v=([A-Za-z0-9_-]{11})/,      // watch?v=ID\n  /youtu\\.be\\/([A-Za-z0-9_-]{11})/, // youtu.be/ID\n  /\\/shorts\\/([A-Za-z0-9_-]{11})/,  // /shorts/ID\n  /\\/live\\/([A-Za-z0-9_-]{11})/,    // /live/ID\n  /\\/embed\\/([A-Za-z0-9_-]{11})/    // /embed/ID\n];\n\nlet videoId = null;\nfor (const p of patterns) {\n  const m = url.match(p);\n  if (m) { videoId = m[1]; break; }\n}\n\nif (!videoId) {\n  throw new Error('Could not read a video ID from this link: ' + url);\n}\n\nreturn [{\n  json: {\n    videoId,\n    videoUrl: url,\n    cleanUrl: 'https://www.youtube.com/watch?v=' + videoId,\n    apiToken: $json.apiToken,\n    driveFolderId: $json.driveFolderId,\n    rowNumber: $json.rowNumber\n  }\n}];"
+      },
+      "id": "code-extract-id",
+      "name": "Extract Video ID",
+      "type": "n8n-nodes-base.code",
+      "position": [-464, 400],
+      "typeVersion": 2,
+      "notes": "Handles watch?v=, youtu.be, /shorts/, /live/ and /embed/ links."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.youtube-transcript.io/api/transcripts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Basic {{ $json.apiToken }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"ids\": [\n    \"{{ $json.videoId }}\"\n  ]\n}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "text"
+            }
+          }
+        }
+      },
+      "id": "http-transcript",
+      "name": "Get Transcript",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [-256, 400],
+      "retryOnFail": true,
+      "typeVersion": 4.2,
+      "waitBetweenTries": 5000,
+      "notes": "Full Response + text, so the next nodes can handle any error safely."
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "sc-200",
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    },
+                    "leftValue": "={{ $json.statusCode }}",
+                    "rightValue": 200
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "OK"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "sc-402",
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    },
+                    "leftValue": "={{ $json.statusCode }}",
+                    "rightValue": 402
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "No Credits"
+            }
+          ],
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "Other Error"
+        },
+        "options": {
+          "looseTypeValidation": true
+        }
+      },
+      "id": "switch-status",
+      "name": "Check API Response",
+      "type": "n8n-nodes-base.switch",
+      "position": [-48, 400],
+      "typeVersion": 3.3
+    },
+    {
+      "parameters": {
+        "jsCode": "const meta = $('Extract Video ID').item.json;\n\nconst raw = ($json && ($json.body ?? $json.data)) ?? null;\n\nlet parsed;\ntry {\n  parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;\n} catch (e) {\n  return [{ json: { ...meta, status: 'error', text: null, error: 'The transcript API sent back something that is not valid JSON.' } }];\n}\n\n// The API has shipped a few different shapes over time. Cover them all.\nconst first = Array.isArray(parsed)\n  ? parsed[0]\n  : (Array.isArray(parsed?.data) ? parsed.data[0] : (parsed?.data ?? parsed));\n\nlet text = first?.text ?? first?.transcript ?? null;\n\n// Shape: tracks[0].transcript = [{ text, start, dur }, ...]\nif (!text && Array.isArray(first?.tracks?.[0]?.transcript)) {\n  text = first.tracks[0].transcript.map(t => t.text).join(' ');\n}\n\n// Shape: transcript already an array of segments\nif (Array.isArray(text)) {\n  text = text.map(t => (typeof t === 'string' ? t : t.text)).join(' ');\n}\n\nconst title = first?.title\n  ?? first?.microformat?.playerMicroformatRenderer?.title?.simpleText\n  ?? first?.videoDetails?.title\n  ?? null;\n\nconst channel = first?.author\n  ?? first?.videoDetails?.author\n  ?? first?.microformat?.playerMicroformatRenderer?.ownerChannelName\n  ?? null;\n\nconst language = first?.language ?? first?.lang ?? first?.tracks?.[0]?.language ?? null;\n\nreturn [{\n  json: {\n    ...meta,\n    title,\n    channel,\n    language,\n    text,\n    status: text ? 'found' : 'no_transcript'\n  }\n}];"
+      },
+      "id": "code-parse",
+      "name": "Parse Response",
+      "type": "n8n-nodes-base.code",
+      "position": [208, 288],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "has-text",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.text }}",
+              "rightValue": ""
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "id": "if-has-transcript",
+      "name": "Got A Transcript?",
+      "type": "n8n-nodes-base.if",
+      "position": [416, 288],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $json;\n\nlet text = typeof d.text === 'string' ? d.text : JSON.stringify(d.text);\n\n// Tidy up without losing anything.\ntext = text\n  .replace(/&(amp;)?#39;/g, \"'\")\n  .replace(/&(amp;)?quot;/g, '\"')\n  .replace(/&(amp;)?#(34|39);/g, \"'\")\n  .replace(/&amp;/g, '&')\n  .replace(/\\r?\\n/g, ' ')\n  .replace(/\\[(music|applause|laughter|mÃºsica|musica|aplausos)\\]/gi, '')\n  .replace(/\\s+/g, ' ')\n  .trim();\n\n// Break the wall of text into readable paragraphs of ~5 sentences.\nconst sentences = text.match(/[^.!?]+[.!?]+|\\S+$/g) || [text];\nconst paragraphs = [];\nfor (let i = 0; i < sentences.length; i += 5) {\n  paragraphs.push(sentences.slice(i, i + 5).join(' ').trim());\n}\nconst bodyText = paragraphs.join('\\n\\n');\n\nconst wordCount = text.split(' ').filter(Boolean).length;\nconst readingMinutes = Math.max(1, Math.round(wordCount / 150));\n\nconst title = d.title || ('YouTube Video ' + d.videoId);\nconst stamp = new Date().toISOString().slice(0, 10);\n\nconst markdown = [\n  '# ' + title,\n  '',\n  '**Source:** ' + d.cleanUrl,\n  d.channel ? '**Channel:** ' + d.channel : null,\n  '**Video ID:** ' + d.videoId,\n  d.language ? '**Language:** ' + d.language : null,\n  '**Words:** ' + wordCount.toLocaleString() + '  (about ' + readingMinutes + ' min of speech)',\n  '**Transcribed:** ' + stamp,\n  '',\n  '---',\n  '',\n  '## Transcript',\n  '',\n  bodyText,\n  ''\n].filter(Boolean).join('\\n');\n\n// Safe filename for Google Drive.\nconst safeTitle = title\n  .replace(/[\\\\/:*?\"<>|#]/g, '')\n  .replace(/\\s+/g, ' ')\n  .trim()\n  .slice(0, 80) || d.videoId;\n\nreturn [{\n  json: {\n    ...d,\n    title,\n    markdown,\n    wordCount,\n    readingMinutes,\n    fileName: stamp + ' - ' + safeTitle + '.md'\n  }\n}];"
+      },
+      "id": "code-markdown",
+      "name": "Build Markdown File",
+      "type": "n8n-nodes-base.code",
+      "position": [624, 192],
+      "typeVersion": 2,
+      "notes": "Adds a title header, source link and word count, then splits the text into paragraphs."
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "markdown",
+        "options": {
+          "fileName": "={{ $json.fileName }}",
+          "mimeType": "text/markdown"
+        }
+      },
+      "id": "convert-file",
+      "name": "Turn Into .md File",
+      "type": "n8n-nodes-base.convertToFile",
+      "position": [832, 192],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "name": "={{ $('Build Markdown File').item.json.fileName }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive",
+          "cachedResultName": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Settings').item.json.driveFolderId }}"
+        },
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "id": "drive-upload",
+      "name": "Save To Google Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [1040, 192],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "REPLACE_WITH_YOUR_GOOGLE_SHEET_URL"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Sheet1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Video URL": "={{ $('Settings').item.json.videoUrl }}",
+            "Status": "Done",
+            "Title": "={{ $('Build Markdown File').item.json.title }}",
+            "Markdown File": "={{ $json.webViewLink }}",
+            "Processed At": "={{ $now.format('yyyy-MM-dd HH:mm') }}",
+            "Notes": "={{ $('Build Markdown File').item.json.wordCount }} words"
+          },
+          "matchingColumns": ["Video URL"],
+          "schema": []
+        },
+        "options": {}
+      },
+      "id": "sheet-done",
+      "name": "Mark Row Done",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [1248, 192],
+      "typeVersion": 4.5
+    },
+    {
+      "parameters": {
+        "jsCode": "// One place to describe whatever went wrong, so the sheet always gets an answer.\nconst s = $('Settings').item.json;\nlet videoId = null;\ntry { videoId = $('Extract Video ID').item.json.videoId; } catch (e) {}\n\nconst reason = $json.failureReason\n  || (typeof $json.text !== 'undefined' && !$json.text ? 'No transcript available. This video has captions turned off, or only auto captions in an unsupported language.' : null)\n  || 'The transcript service returned status ' + ($json.statusCode ?? 'unknown') + '.';\n\nreturn [{\n  json: {\n    videoUrl: s.videoUrl,\n    videoId,\n    status: 'Failed',\n    reason\n  }\n}];"
+      },
+      "id": "code-failure",
+      "name": "Describe The Failure",
+      "type": "n8n-nodes-base.code",
+      "position": [624, 512],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fr-credits",
+              "name": "failureReason",
+              "type": "string",
+              "value": "Out of credits on youtube-transcript.io. Top up the account and paste the link again."
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "set-credits",
+      "name": "Reason: No Credits",
+      "type": "n8n-nodes-base.set",
+      "position": [208, 512],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fr-other",
+              "name": "failureReason",
+              "type": "string",
+              "value": "=The transcript service returned status {{ $json.statusCode }}. Check the API token in the Settings node, or try the link again later."
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "set-other",
+      "name": "Reason: Other Error",
+      "type": "n8n-nodes-base.set",
+      "position": [208, 688],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "REPLACE_WITH_YOUR_GOOGLE_SHEET_URL"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Sheet1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Video URL": "={{ $json.videoUrl }}",
+            "Status": "Failed",
+            "Title": "",
+            "Markdown File": "",
+            "Processed At": "={{ $now.format('yyyy-MM-dd HH:mm') }}",
+            "Notes": "={{ $json.reason }}"
+          },
+          "matchingColumns": ["Video URL"],
+          "schema": []
+        },
+        "options": {}
+      },
+      "id": "sheet-failed",
+      "name": "Mark Row Failed",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [832, 512],
+      "typeVersion": 4.5
+    },
+    {
+      "parameters": {
+        "content": "## The happy path\n\nNew row -> check it is a YouTube link -> pull the video ID -> fetch the transcript -> clean it -> write a .md file -> save to Drive -> mark the row Done.\n\nThe .md file has a header block (title, source link, word count) then the transcript in paragraphs, ready to hand straight to Claude.",
+        "height": 300,
+        "width": 420,
+        "color": 5
+      },
+      "id": "note-happy",
+      "name": "Sticky Note - Happy Path",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [592, -140],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## When it fails\n\nNothing stops silently. Every failure writes **Failed** plus the reason into the same row of your sheet:\n\n- no captions on the video\n- out of API credits\n- bad token or a service error\n\nFix the cause, then clear the Status cell and paste the link into a fresh row.",
+        "height": 320,
+        "width": 420,
+        "color": 3
+      },
+      "id": "note-errors",
+      "name": "Sticky Note - Errors",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [176, 860],
+      "typeVersion": 1
+    }
+  ],
+  "connections": {
+    "New YouTube Link in Sheet": {
+      "main": [[{ "node": "Is It A YouTube Link?", "type": "main", "index": 0 }]]
+    },
+    "Is It A YouTube Link?": {
+      "main": [[{ "node": "Settings", "type": "main", "index": 0 }], []]
+    },
+    "Settings": {
+      "main": [[{ "node": "Extract Video ID", "type": "main", "index": 0 }]]
+    },
+    "Extract Video ID": {
+      "main": [[{ "node": "Get Transcript", "type": "main", "index": 0 }]]
+    },
+    "Get Transcript": {
+      "main": [[{ "node": "Check API Response", "type": "main", "index": 0 }]]
+    },
+    "Check API Response": {
+      "main": [
+        [{ "node": "Parse Response", "type": "main", "index": 0 }],
+        [{ "node": "Reason: No Credits", "type": "main", "index": 0 }],
+        [{ "node": "Reason: Other Error", "type": "main", "index": 0 }]
+      ]
+    },
+    "Parse Response": {
+      "main": [[{ "node": "Got A Transcript?", "type": "main", "index": 0 }]]
+    },
+    "Got A Transcript?": {
+      "main": [
+        [{ "node": "Build Markdown File", "type": "main", "index": 0 }],
+        [{ "node": "Describe The Failure", "type": "main", "index": 0 }]
+      ]
+    },
+    "Build Markdown File": {
+      "main": [[{ "node": "Turn Into .md File", "type": "main", "index": 0 }]]
+    },
+    "Turn Into .md File": {
+      "main": [[{ "node": "Save To Google Drive", "type": "main", "index": 0 }]]
+    },
+    "Save To Google Drive": {
+      "main": [[{ "node": "Mark Row Done", "type": "main", "index": 0 }]]
+    },
+    "Reason: No Credits": {
+      "main": [[{ "node": "Describe The Failure", "type": "main", "index": 0 }]]
+    },
+    "Reason: Other Error": {
+      "main": [[{ "node": "Describe The Failure", "type": "main", "index": 0 }]]
+    },
+    "Describe The Failure": {
+      "main": [[{ "node": "Mark Row Failed", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}
+
+
