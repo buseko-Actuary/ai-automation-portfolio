@@ -1,0 +1,555 @@
+﻿{
+    "settings":  {
+                     "executionOrder":  "v1",
+                     "timezone":  "Africa/Lusaka"
+                 },
+    "name":  "Insight Dentist - VAPI Voice Receptionist",
+    "connections":  {
+                        "Webhook VAPI":  {
+                                             "main":  [
+                                                          [
+                                                              {
+                                                                  "node":  "Extract Tool Args",
+                                                                  "type":  "main",
+                                                                  "index":  0
+                                                              }
+                                                          ]
+                                                      ]
+                                         },
+                        "Route by Tool":  {
+                                              "main":  [
+                                                           [
+                                                               {
+                                                                   "node":  "Get Events",
+                                                                   "type":  "main",
+                                                                   "index":  0
+                                                               }
+                                                           ],
+                                                           [
+                                                               {
+                                                                   "node":  "Book Appointment In Calendar",
+                                                                   "type":  "main",
+                                                                   "index":  0
+                                                               }
+                                                           ]
+                                                       ]
+                                          },
+                        "Get Events":  {
+                                           "main":  [
+                                                        [
+                                                            {
+                                                                "node":  "Find Slots",
+                                                                "type":  "main",
+                                                                "index":  0
+                                                            }
+                                                        ]
+                                                    ]
+                                       },
+                        "Find Slots":  {
+                                           "main":  [
+                                                        [
+                                                            {
+                                                                "node":  "Filter for Free Slots",
+                                                                "type":  "main",
+                                                                "index":  0
+                                                            }
+                                                        ]
+                                                    ]
+                                       },
+                        "Filter for Free Slots":  {
+                                                      "main":  [
+                                                                   [
+                                                                       {
+                                                                           "node":  "Respond with Availability",
+                                                                           "type":  "main",
+                                                                           "index":  0
+                                                                       }
+                                                                   ]
+                                                               ]
+                                                  },
+                        "Book Appointment In Calendar":  {
+                                                             "main":  [
+                                                                          [
+                                                                              {
+                                                                                  "node":  "Booking Confirmation",
+                                                                                  "type":  "main",
+                                                                                  "index":  0
+                                                                              }
+                                                                          ]
+                                                                      ]
+                                                         },
+                        "Booking Confirmation":  {
+                                                     "main":  [
+                                                                  [
+                                                                      {
+                                                                          "node":  "Append row in sheet",
+                                                                          "type":  "main",
+                                                                          "index":  0
+                                                                      }
+                                                                  ]
+                                                              ]
+                                                 },
+                        "Extract Tool Args":  {
+                                                  "main":  [
+                                                               [
+                                                                   {
+                                                                       "node":  "Route by Tool",
+                                                                       "type":  "main",
+                                                                       "index":  0
+                                                                   }
+                                                               ]
+                                                           ]
+                                              },
+                        "Append row in sheet":  {
+                                                    "main":  [
+                                                                 [
+                                                                     {
+                                                                         "node":  "Build SMS",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                                },
+                        "Build SMS":  {
+                                          "main":  [
+                                                       [
+                                                           {
+                                                               "node":  "Phone Looks Valid?",
+                                                               "type":  "main",
+                                                               "index":  0
+                                                           }
+                                                       ]
+                                                   ]
+                                      },
+                        "Phone Looks Valid?":  {
+                                                   "main":  [
+                                                                [
+                                                                    {
+                                                                        "node":  "Send Confirmation SMS",
+                                                                        "type":  "main",
+                                                                        "index":  0
+                                                                    }
+                                                                ]
+                                                            ]
+                                               }
+                    },
+    "pinData":  {
+
+                },
+    "nodes":  [
+                  {
+                      "parameters":  {
+                                         "httpMethod":  "POST",
+                                         "path":  "insight-dentist-vapi",
+                                         "responseMode":  "responseNode",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "54c2ae54-299f-42fb-970e-c8da886f1bfb",
+                      "name":  "Webhook VAPI",
+                      "type":  "n8n-nodes-base.webhook",
+                      "typeVersion":  2,
+                      "position":  [
+                                       -656,
+                                       144
+                                   ],
+                      "webhookId":  "insight-dentist-vapi"
+                  },
+                  {
+                      "parameters":  {
+                                         "rules":  {
+                                                       "values":  [
+                                                                      {
+                                                                          "conditions":  {
+                                                                                             "options":  {
+                                                                                                             "caseSensitive":  true,
+                                                                                                             "leftValue":  "",
+                                                                                                             "typeValidation":  "loose",
+                                                                                                             "version":  1
+                                                                                                         },
+                                                                                             "conditions":  [
+                                                                                                                {
+                                                                                                                    "id":  "c1",
+                                                                                                                    "leftValue":  "={{ $json.toolName }}",
+                                                                                                                    "rightValue":  "checkAvailability",
+                                                                                                                    "operator":  {
+                                                                                                                                     "type":  "string",
+                                                                                                                                     "operation":  "equals"
+                                                                                                                                 }
+                                                                                                                }
+                                                                                                            ],
+                                                                                             "combinator":  "and"
+                                                                                         },
+                                                                          "renameOutput":  true,
+                                                                          "outputKey":  "checkAvailability"
+                                                                      },
+                                                                      {
+                                                                          "conditions":  {
+                                                                                             "options":  {
+                                                                                                             "caseSensitive":  true,
+                                                                                                             "leftValue":  "",
+                                                                                                             "typeValidation":  "loose",
+                                                                                                             "version":  1
+                                                                                                         },
+                                                                                             "conditions":  [
+                                                                                                                {
+                                                                                                                    "id":  "c2",
+                                                                                                                    "leftValue":  "={{ $json.toolName }}",
+                                                                                                                    "rightValue":  "bookAppointment",
+                                                                                                                    "operator":  {
+                                                                                                                                     "type":  "string",
+                                                                                                                                     "operation":  "equals"
+                                                                                                                                 }
+                                                                                                                }
+                                                                                                            ],
+                                                                                             "combinator":  "and"
+                                                                                         },
+                                                                          "renameOutput":  true,
+                                                                          "outputKey":  "bookAppointment"
+                                                                      }
+                                                                  ]
+                                                   },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "effcdb99-11e0-432d-a98d-48a716665b68",
+                      "name":  "Route by Tool",
+                      "type":  "n8n-nodes-base.switch",
+                      "typeVersion":  3.2,
+                      "position":  [
+                                       -240,
+                                       144
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "getAll",
+                                         "calendar":  {
+                                                          "__rl":  true,
+                                                          "value":  "primary",
+                                                          "mode":  "list",
+                                                          "cachedResultName":  "primary"
+                                                      },
+                                         "returnAll":  true,
+                                         "timeMin":  "={{  $json.date  }}T00:00:00+02:00",
+                                         "timeMax":  "={{  $json.date  }}T23:59:59+02:00",
+                                         "options":  {
+                                                         "orderBy":  "startTime"
+                                                     }
+                                     },
+                      "id":  "dc9ac779-5309-4508-b44c-cc50c108e513",
+                      "name":  "Get Events",
+                      "type":  "n8n-nodes-base.googleCalendar",
+                      "typeVersion":  1.3,
+                      "position":  [
+                                       0,
+                                       0
+                                   ],
+                      "credentials":  {
+                                          "googleCalendarOAuth2Api":  {
+                                                                          "id":  "REPLACE_WITH_CREDENTIAL_ID",
+                                                                          "name":  "REPLACE_WITH_CREDENTIAL_NAME"
+                                                                      }
+                                      },
+                      "alwaysOutputData":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "// Build clinic appointment slots for the requested date.\n// Insight Dentist hours: Mon-Fri 08:00-17:00, lunch 13:00-14:00, 30-min slots.\n\nconst edit = $(\u0027Extract Tool Args\u0027).first().json;\nconst dateStr = edit.date; // expected YYYY-MM-DD\n\nconst openHour = 8;\nconst closeHour = 17;   // last slot starts before this hour\nconst slotMinutes = 30;\nconst lunchStart = 13;  // 13:00 - 14:00 closed\nconst lunchEnd = 14;\n\nif (!dateStr) {\n  return [{ json: { start: null, end: null, label: null } }];\n}\n\nconst slots = [];\nfor (let h = openHour; h \u003c closeHour; h++) {\n  if (h \u003e= lunchStart \u0026\u0026 h \u003c lunchEnd) continue;\n  for (let m = 0; m \u003c 60; m += slotMinutes) {\n    const hh = String(h).padStart(2, \u00270\u0027);\n    const mm = String(m).padStart(2, \u00270\u0027);\n    const startISO = `${dateStr}T${hh}:${mm}:00+02:00`;\n    const end = new Date(new Date(startISO).getTime() + slotMinutes * 60000);\n    slots.push({\n      start: startISO,\n      end: end.toISOString(),\n      label: `${hh}:${mm}`\n    });\n  }\n}\n\nreturn slots.map(s =\u003e ({ json: s }));"
+                                     },
+                      "id":  "49effb1f-d694-44cb-86ae-5a20e14bdfdf",
+                      "name":  "Find Slots",
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       224,
+                                       0
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "// Remove any slot that overlaps an existing calendar event, then\n// build a natural-language reply for the voice agent.\n\nconst events = $(\u0027Get Events\u0027).all()\n  .map(e =\u003e e.json)\n  .filter(e =\u003e e \u0026\u0026 e.start);\n\nconst busy = events.map(e =\u003e {\n  const s = new Date(e.start.dateTime || e.start.date).getTime();\n  const en = new Date(e.end.dateTime || e.end.date).getTime();\n  return { s, en };\n});\n\nconst free = [];\nfor (const item of $input.all()) {\n  const slot = item.json;\n  if (!slot.start) continue;\n  const ss = new Date(slot.start).getTime();\n  const se = new Date(slot.end).getTime();\n  const overlap = busy.some(b =\u003e ss \u003c b.en \u0026\u0026 se \u003e b.s);\n  if (!overlap) free.push(slot.label);\n}\n\nconst edit = $(\u0027Extract Tool Args\u0027).first().json;\nconst toolCallId = edit.toolCallId;\nconst dateStr = edit.date;\n\nlet message;\nif (free.length === 0) {\n  message = `I\u0027m sorry, we\u0027re fully booked on ${dateStr}. Would another day work for you?`;\n} else {\n  const show = free.slice(0, 6);\n  message = `On ${dateStr} we have these times open: ${show.join(\u0027, \u0027)}. Which one works best for you?`;\n}\n\nreturn [{ json: { toolCallId, availableSlots: free, message } }];"
+                                     },
+                      "id":  "40ca034c-c3c0-4113-9504-d87679874b14",
+                      "name":  "Filter for Free Slots",
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       448,
+                                       0
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "respondWith":  "json",
+                                         "responseBody":  "={{ { \"results\": [ { \"toolCallId\": $json.toolCallId, \"result\": $json.message } ] } }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "f960b046-df0c-4015-90db-93cbf5d8fdb4",
+                      "name":  "Respond with Availability",
+                      "type":  "n8n-nodes-base.respondToWebhook",
+                      "typeVersion":  1.1,
+                      "position":  [
+                                       672,
+                                       0
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "calendar":  {
+                                                          "__rl":  true,
+                                                          "value":  "primary",
+                                                          "mode":  "list",
+                                                          "cachedResultName":  "primary"
+                                                      },
+                                         "start":  "={{ $json.date }}T{{ $json.time }}:00+02:00",
+                                         "end":  "={{ DateTime.fromISO($json.date + \"T\" + $json.time + \":00+02:00\").plus({ minutes: 30 }).toISO() }}",
+                                         "additionalFields":  {
+                                                                  "description":  "=Patient: {{ $json.name }}\nType: {{ $json.patientType }}\nReason: {{ $json.reason }}\nPhone: {{ $json.phone }}\nEmail: {{ $json.email }}\nBooked via Insight Dentist AI Receptionist",
+                                                                  "summary":  "={{ $json.reason }} - {{ $json.name }}"
+                                                              }
+                                     },
+                      "id":  "0839822d-1cc0-4080-9a6e-cd78b706f22a",
+                      "name":  "Book Appointment In Calendar",
+                      "type":  "n8n-nodes-base.googleCalendar",
+                      "typeVersion":  1.3,
+                      "position":  [
+                                       0,
+                                       288
+                                   ],
+                      "credentials":  {
+                                          "googleCalendarOAuth2Api":  {
+                                                                          "id":  "REPLACE_WITH_CREDENTIAL_ID",
+                                                                          "name":  "REPLACE_WITH_CREDENTIAL_NAME"
+                                                                      }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "respondWith":  "json",
+                                         "responseBody":  "={{ { \"results\": [ { \"toolCallId\": $(\u0027Extract Tool Args\u0027).first().json.toolCallId, \"result\": \"You\u0027re all set, \" + $(\u0027Extract Tool Args\u0027).first().json.name + \". I\u0027ve booked you for \" + $(\u0027Extract Tool Args\u0027).first().json.date + \" at \" + $(\u0027Extract Tool Args\u0027).first().json.time + \" for \" + $(\u0027Extract Tool Args\u0027).first().json.reason + \". Is there anything else I can help with?\" } ] } }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "681e2405-f030-418b-b38f-a9bd0ed98e90",
+                      "name":  "Booking Confirmation",
+                      "type":  "n8n-nodes-base.respondToWebhook",
+                      "typeVersion":  1.1,
+                      "position":  [
+                                       224,
+                                       288
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "append",
+                                         "documentId":  {
+                                                            "__rl":  true,
+                                                            "value":  "REPLACE_WITH_GOOGLE_SHEET_ID",
+                                                            "mode":  "id"
+                                                        },
+                                         "sheetName":  {
+                                                           "__rl":  true,
+                                                           "value":  "Sheet1",
+                                                           "mode":  "name"
+                                                       },
+                                         "columns":  {
+                                                         "mappingMode":  "defineBelow",
+                                                         "value":  {
+                                                                       "Name":  "={{ $(\u0027Extract Tool Args\u0027).first().json.name }}",
+                                                                       "Phone":  "={{ $(\u0027Extract Tool Args\u0027).first().json.phone }}",
+                                                                       "Patient Type":  "={{ $(\u0027Extract Tool Args\u0027).first().json.patientType }}",
+                                                                       "Reason":  "={{ $(\u0027Extract Tool Args\u0027).first().json.reason }}",
+                                                                       "Date":  "={{ $(\u0027Extract Tool Args\u0027).first().json.date }}",
+                                                                       "Time":  "={{ $(\u0027Extract Tool Args\u0027).first().json.time }}",
+                                                                       "Booked At":  "={{ $now.toISO() }}"
+                                                                   },
+                                                         "schema":  [
+                                                                        {
+                                                                            "id":  "Name",
+                                                                            "displayName":  "Name",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "Phone",
+                                                                            "displayName":  "Phone",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "Patient Type",
+                                                                            "displayName":  "Patient Type",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "Reason",
+                                                                            "displayName":  "Reason",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "Date",
+                                                                            "displayName":  "Date",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "Time",
+                                                                            "displayName":  "Time",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "Booked At",
+                                                                            "displayName":  "Booked At",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        }
+                                                                    ],
+                                                         "matchingColumns":  [
+
+                                                                             ]
+                                                     },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "9f38df49-0147-48e4-a9b5-cd56cb8e4a7d",
+                      "name":  "Append row in sheet",
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.5,
+                      "position":  [
+                                       448,
+                                       288
+                                   ],
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id":  "REPLACE_WITH_CREDENTIAL_ID",
+                                                                        "name":  "REPLACE_WITH_CREDENTIAL_NAME"
+                                                                    }
+                                      },
+                      "onError":  "continueRegularOutput"
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "// Vapi sends the tool call payload with an args property whose name n8n\u0027s\n// expression sandbox refuses to read. Grab it here in plain JS instead.\nconst body = $input.first().json.body || {};\nconst call = ((body.message || {}).toolCalls || [])[0] || {};\nconst fn = call.function || {};\nconst argsKey = Object.keys(fn).find(k =\u003e k !== \u0027name\u0027);\nconst a = (argsKey ? fn[argsKey] : {}) || {};\n\n// Guard: the model has been known to invent dates. Flag anything in the past\n// so downstream can refuse instead of silently booking a dead appointment.\nconst today = new Date(new Date().toLocaleString(\u0027en-US\u0027, { timeZone: \u0027Africa/Lusaka\u0027 }));\ntoday.setHours(0, 0, 0, 0);\nlet isPast = false;\nif (a.date) {\n  const req = new Date(a.date + \u0027T00:00:00+02:00\u0027);\n  isPast = !isNaN(req.getTime()) \u0026\u0026 req \u003c today;\n}\n\nreturn [{\n  json: {\n    toolCallId: call.id || \u0027\u0027,\n    toolName: fn.name || \u0027\u0027,\n    name: a.name || \u0027\u0027,\n    patientType: a.patientType || \u0027\u0027,\n    reason: a.reason || \u0027\u0027,\n    date: a.date || \u0027\u0027,\n    time: a.time || \u0027\u0027,\n    phone: a.phone || \u0027\u0027,\n    email: a.email || \u0027\u0027,\n    isPast: isPast,\n    todayISO: today.toISOString().slice(0, 10)\n  }\n}];"
+                                     },
+                      "id":  "6da38fee-81b4-4e7d-b27b-251d089faa81",
+                      "name":  "Extract Tool Args",
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       -220,
+                                       300
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "// Patient-facing confirmation SMS.\n//\n// HARD CONSTRAINT: must stay ONE segment. Tested 2026-09-06 on a Zambian handset:\n// a 2-segment message was silently dropped by the carrier while Twilio still reported\n// \"Delivered\"; the same content as 1 segment arrived. Twilio\u0027s trial prefix eats ~37 of\n// the 160 chars, so the body budget is ~120. Do not lengthen without retesting.\nconst a = $(\u0027Extract Tool Args\u0027).first().json;\n\nconst days   = [\u0027Sun\u0027,\u0027Mon\u0027,\u0027Tue\u0027,\u0027Wed\u0027,\u0027Thu\u0027,\u0027Fri\u0027,\u0027Sat\u0027];\nconst months = [\u0027Jan\u0027,\u0027Feb\u0027,\u0027Mar\u0027,\u0027Apr\u0027,\u0027May\u0027,\u0027Jun\u0027,\u0027Jul\u0027,\u0027Aug\u0027,\u0027Sep\u0027,\u0027Oct\u0027,\u0027Nov\u0027,\u0027Dec\u0027];\n\nconst d = new Date(a.date + \u0027T\u0027 + (a.time || \u002700:00\u0027) + \u0027:00+02:00\u0027);\nlet whenText = a.date + \u0027 \u0027 + a.time;\nif (!isNaN(d.getTime())) {\n  const lus = new Date(d.getTime() + 2 * 60 * 60 * 1000);\n  whenText = days[lus.getUTCDay()] + \u0027 \u0027 + String(lus.getUTCDate()).padStart(2, \u00270\u0027) +\n             \u0027 \u0027 + months[lus.getUTCMonth()] + \u0027 \u0027 + a.time;\n}\n\nlet firstName = (a.name || \u0027\u0027).trim().split(/\\s+/)[0] || \u0027there\u0027;\nif (firstName.length \u003e 12) firstName = firstName.slice(0, 12);\n\nconst BUDGET = 120;\nconst head = \u0027Insight Dentist: Hi \u0027 + firstName + \u0027, appt confirmed \u0027 + whenText + \u0027.\u0027;\nconst tails = [\n  \u0027 Unilus Hospital, Alick Nkhata Rd. Call to reschedule.\u0027,\n  \u0027 Unilus Hospital, Alick Nkhata Rd.\u0027,\n  \u0027 Unilus Hospital.\u0027,\n  \u0027\u0027\n];\nlet body = head;\nfor (const t of tails) {\n  if ((head + t).length \u003c= BUDGET) { body = head + t; break; }\n}\nif (body.length \u003e BUDGET) body = body.slice(0, BUDGET);\n\n// --- phone validation -------------------------------------------------------\n// A Zambian mobile is 9 national digits after the 260 country code (e.g. 966011223).\n// The agent has misheard numbers on live calls (an extra 0 crept in), producing an\n// unroutable REPLACE_WITH_PHONE2. Never guess a correction: flag it and skip the SMS,\n// so a bad number shows up in the logs instead of failing silently at Twilio.\nlet digits = (a.phone || \u0027\u0027).replace(/\\D/g, \u0027\u0027);\nif (digits.startsWith(\u002700\u0027)) digits = digits.slice(2);\nif (digits.startsWith(\u0027260\u0027)) digits = digits.slice(3);\nif (digits.startsWith(\u00270\u0027))   digits = digits.slice(1);\n\nconst valid = /^[79]\\d{8}$/.test(digits);   // Zambian mobiles: 9x/7x + 8 more digits\nconst to = valid ? \u0027+260\u0027 + digits : \u0027\u0027;\n\nreturn [{\n  json: {\n    smsTo: to,\n    smsBody: body,\n    bodyLen: body.length,\n    phoneValid: valid,\n    phoneRaw: a.phone || \u0027\u0027,\n    patient: a.name,\n    when: whenText\n  }\n}];"
+                                     },
+                      "id":  "570dbb7f-0f6c-4e7c-8eba-70d09912a982",
+                      "name":  "Build SMS",
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       1000,
+                                       440
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "resource":  "sms",
+                                         "operation":  "send",
+                                         "from":  "REPLACE_WITH_TWILIO_NUMBER",
+                                         "message":  "={{ $json.smsBody }}",
+                                         "options":  {
+
+                                                     },
+                                         "to":  "={{ $json.smsTo }}"
+                                     },
+                      "id":  "4bae3c4b-b351-4a36-a420-6d4972488395",
+                      "name":  "Send Confirmation SMS",
+                      "type":  "n8n-nodes-base.twilio",
+                      "typeVersion":  1,
+                      "position":  [
+                                       1220,
+                                       440
+                                   ],
+                      "credentials":  {
+                                          "twilioApi":  {
+                                                            "id":  "REPLACE_WITH_CREDENTIAL_ID",
+                                                            "name":  "REPLACE_WITH_CREDENTIAL_NAME"
+                                                        }
+                                      },
+                      "onError":  "continueRegularOutput",
+                      "retryOnFail":  true,
+                      "maxTries":  2
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "options":  {
+                                                                            "caseSensitive":  true,
+                                                                            "leftValue":  "",
+                                                                            "typeValidation":  "loose",
+                                                                            "version":  2
+                                                                        },
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "id":  "phone-valid",
+                                                                                   "leftValue":  "={{ $json.phoneValid }}",
+                                                                                   "rightValue":  "true",
+                                                                                   "operator":  {
+                                                                                                    "type":  "boolean",
+                                                                                                    "operation":  "true",
+                                                                                                    "singleValue":  true
+                                                                                                }
+                                                                               }
+                                                                           ],
+                                                            "combinator":  "and"
+                                                        },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "ff5db84a-0610-431d-a132-83911cbd7700",
+                      "name":  "Phone Looks Valid?",
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  2.2,
+                      "position":  [
+                                       1110,
+                                       440
+                                   ]
+                  }
+              ]
+}
+
