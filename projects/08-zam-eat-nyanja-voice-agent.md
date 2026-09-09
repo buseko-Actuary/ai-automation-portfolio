@@ -1,12 +1,12 @@
 # 🇿🇲 Zam Eat — A Restaurant Phone Agent That Answers in Nyanja, In My Own Voice
 
-![Vapi](https://img.shields.io/badge/Vapi-Voice%20Agent-12A594) ![ElevenLabs](https://img.shields.io/badge/ElevenLabs-Cloned%20Voice-000000) ![n8n](https://img.shields.io/badge/n8n-Workflow%20Automation-EA4B71) ![OpenAI](https://img.shields.io/badge/GPT--4o-Reasoning-412991) ![Nyanja](https://img.shields.io/badge/Language-Nyanja%20%2F%20Chichewa-D6AF7B) ![Downloadable](https://img.shields.io/badge/Template-Free%20to%20import-brightgreen)
+![Vapi](https://img.shields.io/badge/Vapi-Voice%20Agent-12A594) ![ElevenLabs](https://img.shields.io/badge/ElevenLabs-Cloned%20Voice-000000) ![n8n](https://img.shields.io/badge/n8n-Workflow%20Automation-EA4B71) ![OpenAI](https://img.shields.io/badge/GPT--4o-Reasoning-412991) ![Nyanja](https://img.shields.io/badge/Language-Nyanja%20%2F%20Chichewa-D6AF7B)
 
 > **You ring a Lusaka restaurant. A Zambian voice answers in Nyanja, tells you what is on the menu, quotes the price of nshima with T-bone, gives you directions past Manda Hill, and books your table into a live calendar.**
 >
 > **The voice is mine. I cloned it from 101 seconds of audio.**
 
-The n8n workflow is included in full, credentials removed.
+A full write-up of how it was built. The workflow file itself is not published.
 
 ---
 
@@ -171,14 +171,8 @@ The missing piece is recognition. Until speech-to-text covers Bantu languages, a
 
 ---
 
-## 📥 Import it
+## 📥 Availability
 
-1. **n8n:** Workflows → Import from File → `workflows/zam-eat-restaurant-voice-agent.json`
-2. Connect **Google Calendar** and **Google Sheets** credentials, replace `REPLACE_WITH_GOOGLE_SHEET_ID`. The sheet needs a tab named `Reservations` with headers `Name | Phone | Guests | Date | Time | Requests | Booked At`.
-3. Publish the workflow and copy the production webhook URL. For local n8n: `cloudflared tunnel --url http://localhost:5678 --protocol http2`
-4. **ElevenLabs:** clone a voice, copy the Voice ID, create an API key with **Restrict Key OFF**.
-5. **Vapi:** add the ElevenLabs and OpenAI keys under Settings → Integrations so both bill to your own accounts. Create an assistant, set voice provider `11labs` with your Voice ID and model `eleven_v3`.
-6. Create two function tools, `checkTableAvailability` and `bookReservation`, both pointing at the webhook.
-7. Attach a phone number. Note that **free Vapi numbers cannot make outbound international calls**, so for a Zambian demo you dial in rather than having it call you.
+The workflow file for this build is not published. The write-up above is the full architecture, along with the seven failures and the fixes that came out of them.
 
-Configure Vapi through its REST API rather than the dashboard: `POST /tool` for each tool, then `PATCH /assistant/<id>`. Use the **private** key, the public one returns 401.
+If you want a phone agent that answers in your customers' language, [Insight Analytics](https://github.com/buseko-Actuary) builds and deploys them.
