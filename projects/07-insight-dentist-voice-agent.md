@@ -1,10 +1,10 @@
 # ☎️ Insight Dentist — An AI Receptionist That Answers the Phone
 
-![Vapi](https://img.shields.io/badge/Vapi-Voice%20Agent-12A594) ![n8n](https://img.shields.io/badge/n8n-Workflow%20Automation-EA4B71) ![OpenAI](https://img.shields.io/badge/GPT--4o-Reasoning-412991) ![Twilio](https://img.shields.io/badge/Twilio-Voice%20%2B%20SMS-F22F46) ![Google Calendar](https://img.shields.io/badge/Google%20Calendar-Booking-4285F4) ![Downloadable](https://img.shields.io/badge/Template-Free%20to%20import-brightgreen)
+![Vapi](https://img.shields.io/badge/Vapi-Voice%20Agent-12A594) ![n8n](https://img.shields.io/badge/n8n-Workflow%20Automation-EA4B71) ![OpenAI](https://img.shields.io/badge/GPT--4o-Reasoning-412991) ![Twilio](https://img.shields.io/badge/Twilio-Voice%20%2B%20SMS-F22F46) ![Google Calendar](https://img.shields.io/badge/Google%20Calendar-Booking-4285F4)
 
 > **A patient rings a real phone number. A voice answers, offers the times that are actually free, books the appointment, and a confirmation SMS lands before they put the phone down.** No human touches it.
 
-This one is **fully open**. The complete n8n JSON is included, credentials removed.
+A full write-up of the build, including every failure and its fix. The workflow file itself is not published.
 
 The clinic is a demo. The phone call is not.
 
@@ -153,7 +153,7 @@ Twilio's trial prefix eats about 37 of the 160 characters, so the real body budg
 
 ### 8. It misheard a phone number and the caller agreed anyway
 
-On a live call the agent slipped an extra zero into the number, read it back wrongly, and the caller said "perfect" without counting. A ten digit `0966011223` became an eleven digit `09660011223`, and the unroutable `+2609660011223` failed quietly behind the continue-on-error setting.
+On a live call the agent slipped an extra zero into the number, read it back wrongly, and the caller said "perfect" without counting. A ten digit `0977123456` became an eleven digit `09771234560`, and the unroutable `+2609771234560` failed quietly behind the continue-on-error setting.
 
 **Fix, two parts.** The prompt now states that a Zambian mobile is exactly 10 digits starting with 0, and to re-ask rather than read back a number of the wrong length. A validation gate then blocks anything failing `/^[79]\d{8}$/`.
 
@@ -185,13 +185,8 @@ It deliberately does **not** auto-correct. Silently "fixing" a patient's phone n
 
 ---
 
-## 📥 Import it
+## 📥 Availability
 
-1. **n8n:** Workflows → Import from File → `workflows/insight-dentist-voice-agent.json`.
-2. Connect a **Google Calendar** and a **Google Sheets** credential, and replace `REPLACE_WITH_GOOGLE_SHEET_ID`. The sheet needs a tab with the header row `Name | Phone | Patient Type | Reason | Date | Time | Booked At`.
-3. Connect a **Twilio** credential and replace `REPLACE_WITH_TWILIO_NUMBER`.
-4. Publish the workflow and copy the production webhook URL. If n8n is local, expose it: `cloudflared tunnel --url http://localhost:5678 --protocol http2`.
-5. **Vapi:** create an assistant, set the model to OpenAI GPT-4o, and paste the system prompt. Create two function tools, `checkAvailability` and `bookAppointment`, both pointing at the webhook URL.
-6. Import a Twilio number into Vapi and set its inbound assistant. The import form leaves the assistant unset, which is a common reason a number connects but nobody answers.
+The workflow file for this build is not published. The write-up above is the full architecture: the node-by-node table, the routing logic, and every failure and fix, which is the part worth reading.
 
-Configuring Vapi through its REST API is faster and repeatable: `POST /tool` for each tool, then `PATCH /assistant/<id>` with `model.toolIds`. Use the **private** key; the public one returns 401.
+If you want a receptionist like this running on your own number, [Insight Analytics](https://github.com/buseko-Actuary) builds and deploys them.
