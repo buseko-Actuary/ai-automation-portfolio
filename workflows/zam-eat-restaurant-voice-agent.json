@@ -1,0 +1,451 @@
+﻿{
+    "settings":  {
+                     "executionOrder":  "v1",
+                     "timezone":  "Africa/Lusaka"
+                 },
+    "name":  "Zam Eat - VAPI Restaurant Host",
+    "connections":  {
+                        "Webhook VAPI":  {
+                                             "main":  [
+                                                          [
+                                                              {
+                                                                  "node":  "Extract Tool Args",
+                                                                  "type":  "main",
+                                                                  "index":  0
+                                                              }
+                                                          ]
+                                                      ]
+                                         },
+                        "Extract Tool Args":  {
+                                                  "main":  [
+                                                               [
+                                                                   {
+                                                                       "node":  "Route by Tool",
+                                                                       "type":  "main",
+                                                                       "index":  0
+                                                                   }
+                                                               ]
+                                                           ]
+                                              },
+                        "Route by Tool":  {
+                                              "main":  [
+                                                           [
+                                                               {
+                                                                   "node":  "Get Reservations",
+                                                                   "type":  "main",
+                                                                   "index":  0
+                                                               }
+                                                           ],
+                                                           [
+                                                               {
+                                                                   "node":  "Book Table",
+                                                                   "type":  "main",
+                                                                   "index":  0
+                                                               }
+                                                           ]
+                                                       ]
+                                          },
+                        "Get Reservations":  {
+                                                 "main":  [
+                                                              [
+                                                                  {
+                                                                      "node":  "Build Sittings",
+                                                                      "type":  "main",
+                                                                      "index":  0
+                                                                  }
+                                                              ]
+                                                          ]
+                                             },
+                        "Build Sittings":  {
+                                               "main":  [
+                                                            [
+                                                                {
+                                                                    "node":  "Filter Free Sittings",
+                                                                    "type":  "main",
+                                                                    "index":  0
+                                                                }
+                                                            ]
+                                                        ]
+                                           },
+                        "Filter Free Sittings":  {
+                                                     "main":  [
+                                                                  [
+                                                                      {
+                                                                          "node":  "Respond Availability",
+                                                                          "type":  "main",
+                                                                          "index":  0
+                                                                      }
+                                                                  ]
+                                                              ]
+                                                 },
+                        "Book Table":  {
+                                           "main":  [
+                                                        [
+                                                            {
+                                                                "node":  "Reservation Confirmation",
+                                                                "type":  "main",
+                                                                "index":  0
+                                                            }
+                                                        ]
+                                                    ]
+                                       },
+                        "Reservation Confirmation":  {
+                                                         "main":  [
+                                                                      [
+                                                                          {
+                                                                              "node":  "Log Reservation",
+                                                                              "type":  "main",
+                                                                              "index":  0
+                                                                          }
+                                                                      ]
+                                                                  ]
+                                                     }
+                    },
+    "pinData":  {
+
+                },
+    "nodes":  [
+                  {
+                      "parameters":  {
+                                         "httpMethod":  "POST",
+                                         "path":  "zam-eat-vapi",
+                                         "responseMode":  "responseNode",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "4fad959b-993d-4f3b-ac90-8841843f018a",
+                      "name":  "Webhook VAPI",
+                      "type":  "n8n-nodes-base.webhook",
+                      "typeVersion":  2,
+                      "position":  [
+                                       0,
+                                       300
+                                   ],
+                      "webhookId":  "zam-eat-vapi"
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "// Vapi sends tool parameters in a property n8n\u0027s expression sandbox refuses to read\n// (\"Cannot access \u0027arguments\u0027 due to security concerns\"). Grab it in plain JS and\n// find the key by elimination so the word never appears literally.\nconst body = $input.first().json.body || {};\nconst call = ((body.message || {}).toolCalls || [])[0] || {};\nconst fn = call.function || {};\nconst argsKey = Object.keys(fn).find(k =\u003e k !== \u0027name\u0027);\nconst a = (argsKey ? fn[argsKey] : {}) || {};\n\nconst today = new Date(new Date().toLocaleString(\u0027en-US\u0027, { timeZone: \u0027Africa/Lusaka\u0027 }));\ntoday.setHours(0, 0, 0, 0);\nlet isPast = false;\nif (a.date) {\n  const req = new Date(a.date + \u0027T00:00:00+02:00\u0027);\n  isPast = !isNaN(req.getTime()) \u0026\u0026 req \u003c today;\n}\n\nreturn [{\n  json: {\n    toolCallId: call.id || \u0027\u0027,\n    toolName: fn.name || \u0027\u0027,\n    name: a.name || \u0027\u0027,\n    guests: Number(a.guests) || 0,\n    date: a.date || \u0027\u0027,\n    time: a.time || \u0027\u0027,\n    phone: a.phone || \u0027\u0027,\n    requests: a.requests || \u0027\u0027,\n    isPast: isPast,\n    todayISO: today.toISOString().slice(0, 10)\n  }\n}];"
+                                     },
+                      "id":  "c150d431-479b-4eaa-b2e1-f4e9553f2328",
+                      "name":  "Extract Tool Args",
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       200,
+                                       300
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "rules":  {
+                                                       "values":  [
+                                                                      {
+                                                                          "conditions":  {
+                                                                                             "options":  {
+                                                                                                             "caseSensitive":  true,
+                                                                                                             "leftValue":  "",
+                                                                                                             "typeValidation":  "loose",
+                                                                                                             "version":  2
+                                                                                                         },
+                                                                                             "conditions":  [
+                                                                                                                {
+                                                                                                                    "id":  "c1",
+                                                                                                                    "leftValue":  "={{ $json.toolName }}",
+                                                                                                                    "rightValue":  "checkTableAvailability",
+                                                                                                                    "operator":  {
+                                                                                                                                     "type":  "string",
+                                                                                                                                     "operation":  "equals"
+                                                                                                                                 }
+                                                                                                                }
+                                                                                                            ],
+                                                                                             "combinator":  "and"
+                                                                                         },
+                                                                          "renameOutput":  true,
+                                                                          "outputKey":  "checkTableAvailability"
+                                                                      },
+                                                                      {
+                                                                          "conditions":  {
+                                                                                             "options":  {
+                                                                                                             "caseSensitive":  true,
+                                                                                                             "leftValue":  "",
+                                                                                                             "typeValidation":  "loose",
+                                                                                                             "version":  2
+                                                                                                         },
+                                                                                             "conditions":  [
+                                                                                                                {
+                                                                                                                    "id":  "c2",
+                                                                                                                    "leftValue":  "={{ $json.toolName }}",
+                                                                                                                    "rightValue":  "bookReservation",
+                                                                                                                    "operator":  {
+                                                                                                                                     "type":  "string",
+                                                                                                                                     "operation":  "equals"
+                                                                                                                                 }
+                                                                                                                }
+                                                                                                            ],
+                                                                                             "combinator":  "and"
+                                                                                         },
+                                                                          "renameOutput":  true,
+                                                                          "outputKey":  "bookReservation"
+                                                                      }
+                                                                  ]
+                                                   },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "50a9892e-ee33-49ad-b2c1-5ba1acbce3e3",
+                      "name":  "Route by Tool",
+                      "type":  "n8n-nodes-base.switch",
+                      "typeVersion":  3.2,
+                      "position":  [
+                                       400,
+                                       300
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "getAll",
+                                         "calendar":  {
+                                                          "__rl":  true,
+                                                          "value":  "primary",
+                                                          "mode":  "list",
+                                                          "cachedResultName":  "primary"
+                                                      },
+                                         "returnAll":  true,
+                                         "options":  {
+                                                         "timeMin":  "={{ $json.date }}T00:00:00+02:00",
+                                                         "timeMax":  "={{ $json.date }}T23:59:59+02:00",
+                                                         "singleEvents":  true,
+                                                         "orderBy":  "startTime"
+                                                     }
+                                     },
+                      "id":  "bdd38378-63fa-4d61-a95d-9d7cfd90be63",
+                      "name":  "Get Reservations",
+                      "type":  "n8n-nodes-base.googleCalendar",
+                      "typeVersion":  1.3,
+                      "position":  [
+                                       620,
+                                       140
+                                   ],
+                      "credentials":  {
+                                          "googleCalendarOAuth2Api":  {
+                                                                          "id":  "REPLACE_WITH_CREDENTIAL_ID",
+                                                                          "name":  "REPLACE_WITH_CREDENTIAL_NAME"
+                                                                      }
+                                      },
+                      "alwaysOutputData":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "// Zam Eat service hours, Africa/Lusaka (+02:00).\n// Open every day 10:00 to 22:00. Kitchen stops one hour before closing, so the\n// last sitting is 90 minutes before close. These hours must stay in step with the\n// opening-hours line in the assistant prompt and the Nyanja script, or the agent\n// will quote one thing and offer another.\nconst a = $(\u0027Extract Tool Args\u0027).first().json;\nconst dateStr = a.date;\nif (!dateStr) return [{ json: { start: null, end: null, label: null } }];\n\nconst openHour = 10;\nconst closeHour = 22;\nconst lastSitting = closeHour - 1.5;\nconst slotMinutes = 30;\nconst tableMinutes = 90;\n\nconst slots = [];\nfor (let t = openHour; t \u003c= lastSitting; t += slotMinutes / 60) {\n  const h = Math.floor(t);\n  const m = Math.round((t - h) * 60);\n  const hh = String(h).padStart(2, \u00270\u0027);\n  const mm = String(m).padStart(2, \u00270\u0027);\n  const startISO = `${dateStr}T${hh}:${mm}:00+02:00`;\n  const end = new Date(new Date(startISO).getTime() + tableMinutes * 60000);\n  slots.push({ start: startISO, end: end.toISOString(), label: `${hh}:${mm}` });\n}\nreturn slots.map(s =\u003e ({ json: s }));"
+                                     },
+                      "id":  "6250c691-2474-4d31-bf97-ac12e0aea2b0",
+                      "name":  "Build Sittings",
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       820,
+                                       140
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "// The dining room seats 40. Each existing reservation carries its party size in the\n// event title, so capacity is counted in covers rather than tables.\nconst CAPACITY = 40;\n\nconst events = $(\u0027Get Reservations\u0027).all().map(e =\u003e e.json).filter(e =\u003e e \u0026\u0026 e.start);\nconst booked = events.map(e =\u003e {\n  const s = new Date(e.start.dateTime || e.start.date).getTime();\n  const en = new Date(e.end.dateTime || e.end.date).getTime();\n  const m = (e.summary || \u0027\u0027).match(/\\((\\d+)\\s*guests?\\)/i);\n  return { s, en, covers: m ? Number(m[1]) : 2 };\n});\n\nconst a = $(\u0027Extract Tool Args\u0027).first().json;\nconst party = Number(a.guests) || 2;\n\nconst free = [];\nfor (const item of $input.all()) {\n  const slot = item.json;\n  if (!slot.start) continue;\n  const ss = new Date(slot.start).getTime();\n  const se = new Date(slot.end).getTime();\n  const taken = booked\n    .filter(b =\u003e ss \u003c b.en \u0026\u0026 se \u003e b.s)\n    .reduce((sum, b) =\u003e sum + b.covers, 0);\n  if (taken + party \u003c= CAPACITY) free.push(slot.label);\n}\n\nlet message;\nif (party \u003e= 11) {\n  message = `For a party of ${party} our events manager handles the booking. I can take your name and number and have them call you back today.`;\n} else if (free.length === 0) {\n  message = `I\u0027m sorry, we\u0027re fully booked on ${a.date}. Would another day work?`;\n} else {\n  const show = free.slice(0, 6);\n  message = `On ${a.date} we can seat ${party} at: ${show.join(\u0027, \u0027)}. Which suits you?`;\n}\n\nreturn [{ json: { toolCallId: a.toolCallId, availableTimes: free, message } }];"
+                                     },
+                      "id":  "8a8880e2-e4f4-48bb-9430-c92df13aae53",
+                      "name":  "Filter Free Sittings",
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       1020,
+                                       140
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "respondWith":  "json",
+                                         "responseBody":  "={{ { \"results\": [ { \"toolCallId\": $json.toolCallId, \"result\": $json.message } ] } }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "0d2cecd1-d830-4884-a3aa-498a6adf8361",
+                      "name":  "Respond Availability",
+                      "type":  "n8n-nodes-base.respondToWebhook",
+                      "typeVersion":  1.1,
+                      "position":  [
+                                       1220,
+                                       140
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "create",
+                                         "calendar":  {
+                                                          "__rl":  true,
+                                                          "value":  "primary",
+                                                          "mode":  "list",
+                                                          "cachedResultName":  "primary"
+                                                      },
+                                         "start":  "={{ $json.date }}T{{ $json.time }}:00+02:00",
+                                         "end":  "={{ DateTime.fromISO($json.date + \"T\" + $json.time + \":00+02:00\").plus({ minutes: 90 }).toISO() }}",
+                                         "additionalFields":  {
+                                                                  "summary":  "=Zam Eat: {{ $json.name }} ({{ $json.guests }} guests)",
+                                                                  "description":  "=Guest: {{ $json.name }}\nParty size: {{ $json.guests }}\nPhone: {{ $json.phone }}\nRequests: {{ $json.requests }}\nBooked via Zam Eat AI host",
+                                                                  "timezone":  {
+                                                                                   "__rl":  true,
+                                                                                   "value":  "Africa/Lusaka",
+                                                                                   "mode":  "list",
+                                                                                   "cachedResultName":  "Africa/Lusaka"
+                                                                               }
+                                                              }
+                                     },
+                      "id":  "1f6cc463-793f-4449-a982-59444aa9c674",
+                      "name":  "Book Table",
+                      "type":  "n8n-nodes-base.googleCalendar",
+                      "typeVersion":  1.3,
+                      "position":  [
+                                       620,
+                                       460
+                                   ],
+                      "credentials":  {
+                                          "googleCalendarOAuth2Api":  {
+                                                                          "id":  "REPLACE_WITH_CREDENTIAL_ID",
+                                                                          "name":  "REPLACE_WITH_CREDENTIAL_NAME"
+                                                                      }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "respondWith":  "json",
+                                         "responseBody":  "={{ { \"results\": [ { \"toolCallId\": $(\u0027Extract Tool Args\u0027).first().json.toolCallId, \"result\": \"Lovely, that\u0027s booked. A table for \" + $(\u0027Extract Tool Args\u0027).first().json.guests + \" on \" + $(\u0027Extract Tool Args\u0027).first().json.date + \" at \" + $(\u0027Extract Tool Args\u0027).first().json.time + \", under \" + $(\u0027Extract Tool Args\u0027).first().json.name + \". Anything else?\" } ] } }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "313bde43-06ce-48a4-9da3-480a62bd3037",
+                      "name":  "Reservation Confirmation",
+                      "type":  "n8n-nodes-base.respondToWebhook",
+                      "typeVersion":  1.1,
+                      "position":  [
+                                       820,
+                                       460
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "append",
+                                         "documentId":  {
+                                                            "__rl":  true,
+                                                            "value":  "REPLACE_WITH_GOOGLE_SHEET_ID",
+                                                            "mode":  "id"
+                                                        },
+                                         "sheetName":  {
+                                                           "__rl":  true,
+                                                           "value":  "Reservations",
+                                                           "mode":  "name"
+                                                       },
+                                         "columns":  {
+                                                         "mappingMode":  "defineBelow",
+                                                         "value":  {
+                                                                       "Name":  "={{ $(\u0027Extract Tool Args\u0027).first().json.name }}",
+                                                                       "Phone":  "=\u0027{{ $(\u0027Extract Tool Args\u0027).first().json.phone }}",
+                                                                       "Guests":  "={{ $(\u0027Extract Tool Args\u0027).first().json.guests }}",
+                                                                       "Date":  "={{ $(\u0027Extract Tool Args\u0027).first().json.date }}",
+                                                                       "Time":  "={{ $(\u0027Extract Tool Args\u0027).first().json.time }}",
+                                                                       "Requests":  "={{ $(\u0027Extract Tool Args\u0027).first().json.requests }}",
+                                                                       "Booked At":  "={{ $now.toISO() }}"
+                                                                   },
+                                                         "schema":  [
+                                                                        {
+                                                                            "id":  "Name",
+                                                                            "displayName":  "Name",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "Phone",
+                                                                            "displayName":  "Phone",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "Guests",
+                                                                            "displayName":  "Guests",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "Date",
+                                                                            "displayName":  "Date",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "Time",
+                                                                            "displayName":  "Time",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "Requests",
+                                                                            "displayName":  "Requests",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "Booked At",
+                                                                            "displayName":  "Booked At",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        }
+                                                                    ],
+                                                         "matchingColumns":  [
+
+                                                                             ]
+                                                     },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "a006ce00-0931-4b15-a152-16fcdf71c757",
+                      "name":  "Log Reservation",
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.5,
+                      "position":  [
+                                       1020,
+                                       460
+                                   ],
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id":  "REPLACE_WITH_CREDENTIAL_ID",
+                                                                        "name":  "REPLACE_WITH_CREDENTIAL_NAME"
+                                                                    }
+                                      },
+                      "onError":  "continueRegularOutput"
+                  }
+              ]
+}

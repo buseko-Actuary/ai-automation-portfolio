@@ -8,6 +8,22 @@
 
 ---
 
+## 🇿🇲 Start here: a phone agent that answers in Nyanja, in my own voice
+
+**You ring a Lusaka restaurant. A Zambian voice answers in Nyanja, quotes the price of nshima with T-bone, gives directions past Manda Hill, and books your table into a live calendar.**
+
+**The voice is mine, cloned from 101 seconds of audio.**
+
+Most voice AI assumes the caller speaks English, or one of about thirty well-resourced languages. Zambia has 72. This build closes that gap, and documents exactly where it still cannot be closed.
+
+The finding that shaped it: **speaking a language and understanding it are separate problems.** ElevenLabs supports Chichewa, so the agent speaks Nyanja fluently. No mainstream speech-to-text supports Nyanja at all, so it cannot understand a word of it. The demo is designed around that honestly rather than pretending otherwise.
+
+**→ [Read the build: Zam Eat Nyanja voice agent](projects/08-zam-eat-nyanja-voice-agent.md)** · ⬇️ [Workflow, free to import](workflows/zam-eat-restaurant-voice-agent.json)
+
+Seven documented failures in there, including an agent that could not read its own replies, one that answered a price question by reciting the menu, and a transcriber tweak that made it say *"confirm your Mumba"* instead of *"number"*.
+
+---
+
 ## ✨ Case studies
 
 | Project | What it does | Client |
@@ -38,6 +54,7 @@ Personal builds exploring new tools, also **free to import:**
 
 | Project | What it does | |
 |---|---|---|
+| 🇿🇲 [Zam Eat Nyanja Voice Agent](projects/08-zam-eat-nyanja-voice-agent.md) | A restaurant phone agent that answers in Nyanja using my own cloned voice. Books real tables into a live calendar. Seven documented failures, including why the model could not read its own replies | ⬇️ [Downloadable](workflows/zam-eat-restaurant-voice-agent.json) |
 | ☎️ [Insight Dentist Voice Agent](projects/07-insight-dentist-voice-agent.md) | A real phone call books a real appointment. Vapi + GPT-4o answers, reads the live calendar, books it, logs it and sends a confirmation SMS. Eight documented failures, including an agent that confidently booked a date in 2023 | ⬇️ [Downloadable](workflows/insight-dentist-voice-agent.json) |
 | 📼 [YouTube to Markdown](projects/06-youtube-transcript-to-markdown.md) | Paste a YouTube link into a Google Sheet, get a clean markdown transcript in Drive, ready to hand to an AI assistant. Every failure reason written back to the row | ⬇️ [Downloadable](workflows/youtube-transcript-to-markdown.json) |
 | 🧠 [WhatsApp RAG Agent](projects/05-whatsapp-rag-agent.md) | Drop a document in Google Drive, ask about it on WhatsApp. Pinecone vector store + OpenAI embeddings, retrieval wired to the agent as a tool | ⬇️ [Downloadable](workflows/whatsapp-rag-agent.json) |
